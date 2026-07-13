@@ -48,19 +48,22 @@ ll nCr(ll n, ll r){
     return (((f[n]*fi[r])%MODE)*(fi[n-r]%MODE))%MODE;
 }
 
+ll help(vll &v, ll l, ll r, vector<vector<ll>> &dp) {
+    if(l>r) return 0LL;
+    if(dp[l][r]!=-1) return dp[l][r];
+    ll left = v[l]-help(v, l+1, r, dp);
+    ll right = v[r]-help(v, l, r-1, dp);
+    return dp[l][r] = max(left, right);
+}
     
 void solve() {
     i1(n);
     vin(n, v);
-    set<ll> st;
-    for(auto &it: v) {
-        set<ll> curr;
-        for(auto &k: st) curr.insert(k+it);
-        for(auto &k: curr) st.insert(k);
-        st.insert(it);
-    }
-    cout << st.size() << nl;
-    for(auto &it: st) cout << it << " ";
+    vector<vector<ll>> dp(n, vector<ll>(n, -1));
+    ll ans = help(v, 0, n-1, dp);
+    ll sum = 0;
+    for(auto &it: v) sum += it;
+    cout << (ans+sum)/2;
 }
 
 

@@ -48,19 +48,26 @@ ll nCr(ll n, ll r){
     return (((f[n]*fi[r])%MODE)*(fi[n-r]%MODE))%MODE;
 }
 
+ll help(vector<vll> &v, ll i, vll &dp) {
+    if(i>=v.size()) return 0LL;
+    if(dp[i]!=-1) return dp[i];
+    ll notake = help(v, i+1, dp);
+    vll fi = {v[i][1], LLONG_MAX, LLONG_MAX};
+    ll nxt = upper_bound(v.begin(), v.end(), fi)-v.begin();
+    ll take = v[i][2]+help(v, nxt, dp);
+    return dp[i] = max(notake, take);
+}
     
 void solve() {
     i1(n);
-    vin(n, v);
-    set<ll> st;
-    for(auto &it: v) {
-        set<ll> curr;
-        for(auto &k: st) curr.insert(k+it);
-        for(auto &k: curr) st.insert(k);
-        st.insert(it);
+    vector<vll> v(n, vll(3));
+    for(ll i=0;i<n;i++){
+        cin >> v[i][0] >> v[i][1] >> v[i][2];
     }
-    cout << st.size() << nl;
-    for(auto &it: st) cout << it << " ";
+    sort(v.begin(), v.end());
+    vll dp(n, -1);
+    ll ans = help(v, 0, dp);
+    cout << ans;
 }
 
 

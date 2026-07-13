@@ -52,15 +52,13 @@ ll nCr(ll n, ll r){
 void solve() {
     i1(n);
     vin(n, v);
-    set<ll> st;
-    for(auto &it: v) {
-        set<ll> curr;
-        for(auto &k: st) curr.insert(k+it);
-        for(auto &k: curr) st.insert(k);
-        st.insert(it);
+    vll curr;
+    for(ll i=0;i<n;i++){
+        auto it = lower_bound(curr.begin(), curr.end(), v[i]);
+        if(it==curr.end()) curr.emplace_back(v[i]);
+        else *it = v[i];
     }
-    cout << st.size() << nl;
-    for(auto &it: st) cout << it << " ";
+    cout << curr.size();
 }
 
 

@@ -48,19 +48,60 @@ ll nCr(ll n, ll r){
     return (((f[n]*fi[r])%MODE)*(fi[n-r]%MODE))%MODE;
 }
 
+ll help(ll n, ll pos, ll tight, ll lst, vector<vector<vector<ll>>> &dp) {
+    if(pos == 0) return 1LL;
+    if(dp[pos][tight][lst+1]!=-1) return dp[pos][tight][lst+1];
+    ll digit = (n/power(10, pos-1))%10;
+    ll res = 0LL;
+    if(tight) {
+        if(lst == -1) {
+            for(ll i=1;i<digit;i++) res += help(n, pos-1, 0, i, dp);
+            res += help(n, pos-1, 1, digit, dp);
+            if(digit!=0) res += help(n, pos-1, 0, -1, dp);
+        }
+        else{
+            for(ll i=0;i<digit;i++){
+                if(i == lst) continue;
+                res += help(n, pos-1, 0, i, dp);
+            }
+            if(digit!=lst) res += help(n, pos-1, 1, digit, dp);
+        }
+    }
+    else{
+        if(lst==-1) {
+            for(ll i=1;i<10;i++) res += help(n, pos-1, 0, i, dp);
+            res += help(n, pos-1, 0, -1, dp);
+        }
+        else{
+            for(ll i=0;i<10;i++) {
+                if(i == lst) continue;
+                res += help(n, pos-1, 0, i, dp);
+            }
+        }
+    }
+    return dp[pos][tight][lst+1] = res;
+}
     
 void solve() {
-    i1(n);
-    vin(n, v);
-    set<ll> st;
-    for(auto &it: v) {
-        set<ll> curr;
-        for(auto &k: st) curr.insert(k+it);
-        for(auto &k: curr) st.insert(k);
-        st.insert(it);
+    i2(l, r);
+    ll pos = 0;
+    ll val = r;
+    while(val) {
+        pos++;
+        val /= 10;
     }
-    cout << st.size() << nl;
-    for(auto &it: st) cout << it << " ";
+    vector<vector<vector<ll>>> dp(pos+1, vector<vector<ll>>(2, vll(11, -1)));
+    ll ans = help(r, pos, 1, -1, dp);
+    if(l-1>=0){
+        val = l-1; pos = 0;
+        while(val){
+            pos++;
+            val /= 10;
+        }
+        vector<vector<vector<ll>>> dp(pos+1, vector<vector<ll>>(2, vll(11, -1)));
+        ans -= help(l-1, pos, 1, -1, dp);
+    }
+    cout << ans;
 }
 
 

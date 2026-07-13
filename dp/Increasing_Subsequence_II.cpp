@@ -47,20 +47,51 @@ void calf(){
 ll nCr(ll n, ll r){
     return (((f[n]*fi[r])%MODE)*(fi[n-r]%MODE))%MODE;
 }
-
     
 void solve() {
     i1(n);
-    vin(n, v);
-    set<ll> st;
-    for(auto &it: v) {
-        set<ll> curr;
-        for(auto &k: st) curr.insert(k+it);
-        for(auto &k: curr) st.insert(k);
-        st.insert(it);
+    vll tm(n);
+    vll v(n);
+    for(ll i=0;i<n;i++){
+        cin >> v[i];
+        tm[i] = v[i];
     }
-    cout << st.size() << nl;
-    for(auto &it: st) cout << it << " ";
+    sot(tm);
+    map<ll, ll> mp;
+    ll curr = 1;
+    for(ll i=0;i<n;i++) mp[tm[i]] = curr++;
+    vll seg(4*(n+1));
+
+    function<void(ll, ll, ll, ll, ll)> update = [&](ll ind, ll l, ll r, ll v, ll val) -> void {
+        if(l == r){
+            seg[ind] = (seg[ind]+val)%MODE;
+            return;
+        }
+        ll mid = (l+r)/2;
+        if(v<=mid) update(2*ind+1, l, mid, v, val);
+        else update(2*ind+2, mid+1, r, v, val);
+        seg[ind] = (seg[2*ind+1]+seg[2*ind+2])%MODE;
+    };
+
+    function<ll(ll, ll, ll, ll, ll)> query = [&](ll ind, ll l, ll r, ll ql, ll qr) -> ll {
+        if(ql<=l && r<=qr) return seg[ind];
+        if(ql>r || qr<l) return 0LL;
+        ll mid = (l+r)/2;
+        ll left = query(2*ind+1, l, mid, ql, qr);
+        ll right = query(2*ind+2, mid+1, r, ql, qr);
+        return (left+right)%MODE;
+    };
+    
+    vll dp(n, 1LL);
+    update(0, 0, n, mp[v[0]], 1);
+    ll ans = 1LL;
+    for(ll i=1;i<n;i++){
+        ll k = query(0, 0, n, 1, mp[v[i]]-1);
+        dp[i] = (dp[i]+k)%MODE;
+        update(0, 0, n, mp[v[i]], dp[i]);
+        ans = (ans+dp[i])%MODE;
+    }
+    cout << ans;
 }
 
 

@@ -48,19 +48,61 @@ ll nCr(ll n, ll r){
     return (((f[n]*fi[r])%MODE)*(fi[n-r]%MODE))%MODE;
 }
 
+void update(ll ind, ll l, ll r, vll &seg, ll index, ll val) {
+    if(l == r) {
+        seg[ind] = val;
+        return;
+    }
+    ll mid = (l+r)/2;
+    if(index<=mid) update(2*ind+1, l, mid, seg, index, val);
+    else update(2*ind+2, mid+1, r, seg, index, val);
+    seg[ind] = max(seg[2*ind+1], seg[2*ind+2]);
+}
+
+ll query(ll ind, ll l, ll r, ll ql, ll qr, vll &seg) {
+    if(ql<=l && r<=qr) return seg[ind];
+    if(ql>r || qr<l) return 0LL;
+    ll mid = (l+r)/2;
+    ll left = query(2*ind+1, l, mid, ql, qr, seg);
+    ll right = query(2*ind+2, mid+1, r, ql, qr, seg);
+    return max(left, right);
+}
+
     
 void solve() {
     i1(n);
-    vin(n, v);
-    set<ll> st;
-    for(auto &it: v) {
-        set<ll> curr;
-        for(auto &k: st) curr.insert(k+it);
-        for(auto &k: curr) st.insert(k);
-        st.insert(it);
+    vector<pair<ll, ll>> v(n);
+    for(ll i=0;i<n;i++){
+        cin >> v[i].first;
+        v[i].second = i;
     }
-    cout << st.size() << nl;
-    for(auto &it: st) cout << it << " ";
+    stack<ll> st;
+    vll left(n, -1);
+    vll right(n, n);
+    for(ll i=0;i<n;i++){
+        while(st.size() && v[st.top()].first < v[i].first) st.pop();
+        if(st.size()) left[i] = st.top();
+        st.push(i);
+    }
+    while(st.size()) st.pop();
+    for(ll i=n-1;i>=0;i--){
+        while(st.size() && v[st.top()].first < v[i].first) st.pop();
+        if(st.size()) right[i] = st.top();
+        st.push(i);
+    }
+    vll seg(4*n);
+    ll ans = 0;
+    sort(v.begin(), v.end());
+    for(ll i=0;i<n;i++){
+        ll l = 0, r = 0;
+        ll ind = v[i].second;
+        if(left[ind]+1 <= ind-1) l = query(0, 0, n-1, left[ind]+1, ind-1, seg);
+        if(ind+1 <= right[ind]-1) r = query(0, 0, n-1, ind+1, right[ind]-1, seg);
+        ll val = max(l, r)+1;
+        ans = max(ans, val);
+        update(0, 0, n-1, seg, ind, val);
+    }
+    cout << ans;
 }
 
 

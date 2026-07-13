@@ -50,17 +50,29 @@ ll nCr(ll n, ll r){
 
     
 void solve() {
-    i1(n);
+    i2(n, k);
     vin(n, v);
-    set<ll> st;
-    for(auto &it: v) {
-        set<ll> curr;
-        for(auto &k: st) curr.insert(k+it);
-        for(auto &k: curr) st.insert(k);
-        st.insert(it);
+    ll limit = (1LL<<n);
+    vector<pair<ll, ll>> dp(limit, {n+1, 0});
+    dp[0] = {1, 0};
+    for(ll i=0;i<limit;i++){
+        for(ll j=0;j<n;j++) {
+            if(((i>>j)&1) == 0) {
+                ll nxt = (i|(1<<j));
+                pair<ll, ll> val;
+                if(dp[i].second + v[j] <= k) {
+                    val = {dp[i].first, dp[i].second+v[j]};
+                }
+                else{
+                    val = {dp[i].first+1, v[j]};
+                }
+                if(dp[nxt] > val) dp[nxt] = val;
+
+            }
+        }
     }
-    cout << st.size() << nl;
-    for(auto &it: st) cout << it << " ";
+    cout << dp[limit-1].first;
+
 }
 
 

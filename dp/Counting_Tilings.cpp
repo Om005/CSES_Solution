@@ -50,17 +50,7 @@ ll nCr(ll n, ll r){
 
     
 void solve() {
-    i1(n);
-    vin(n, v);
-    set<ll> st;
-    for(auto &it: v) {
-        set<ll> curr;
-        for(auto &k: st) curr.insert(k+it);
-        for(auto &k: curr) st.insert(k);
-        st.insert(it);
-    }
-    cout << st.size() << nl;
-    for(auto &it: st) cout << it << " ";
+    // pending...
 }
 
 
